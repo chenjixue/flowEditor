@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>加节点</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="5" transform="translate(-822.000000, -356.000000)">
+            <g id="下钻展开" transform="translate(822.000000, 356.000000)">
+                <circle id="椭圆形" fill="#3A77F0" cx="8" cy="8" r="8"></circle>
+                <path d="M4.7985352,7.18087511 L11.2659036,7.18087511 C11.7123822,7.18087511 12.0743247,7.54281754 12.0743247,7.98929616 C12.0743247,8.43577478 11.7123822,8.79771721 11.2659036,8.79771721 L4.7985352,8.79771721 C4.35205658,8.79771721 3.99011415,8.43577478 3.99011415,7.98929616 C3.99011415,7.54281754 4.35205658,7.18087511 4.7985352,7.18087511 Z" id="矩形" fill="#FFFFFF"></path>
+                <rect id="矩形备份" fill="#FFFFFF" x="7.22379836" y="3.94719089" width="1.61684211" height="8.08421053" rx="0.808421053"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

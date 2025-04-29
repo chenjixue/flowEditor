@@ -1,0 +1,258 @@
+{
+  "nodes": [
+    {
+      "id": "23531720",
+      "type": "start",
+      "position": {
+        "x": 123.17177798830606,
+        "y": -58.78299908052439
+      },
+      "targetPosition": "left",
+      "sourcePosition": "right",
+      "data": {
+        "bizData": {
+          "id": "23531720",
+          "type": "start",
+          "name": "开始",
+          "description": "",
+          "position": {
+            "x": 123.17177798830606,
+            "y": -58.78299908052439
+          },
+          "inputVariable": [
+            {
+              "name": "question",
+              "dataType": "text"
+            },
+            {
+              "name": "extraInfo",
+              "dataType": "json"
+            },
+            {
+              "name": "memories",
+              "dataType": "text"
+            },
+            {
+              "name": "memoryList",
+              "dataType": "list"
+            },
+            {
+              "name": "sessionStatus",
+              "dataType": "json"
+            }
+          ]
+        },
+        "id": "23531720",
+        "type": "start"
+      }
+    },
+    {
+      "id": "27133446",
+      "type": "model",
+      "position": {
+        "x": 635.5027550457907,
+        "y": -16.740639287632888
+      },
+      "targetPosition": "left",
+      "sourcePosition": "right",
+      "data": {
+        "bizData": {
+          "id": "27133446",
+          "type": "model",
+          "name": "大模型",
+          "description": "",
+          "position": {
+            "x": 635.5027550457907,
+            "y": -16.740639287632888
+          },
+          "modelId": 90070,
+          "parameter": [
+            {
+              "name": "do_sample",
+              "turnOn": false,
+              "dataType": "bool",
+              "defaultValue": true,
+              "minValue": null,
+              "maxValue": null,
+              "remark": "是否使用使用采样, false 使用贪婪解码, 贪婪查找最大条件概率的词, temperature、top_p不生效",
+              "value": true
+            },
+            {
+              "name": "temperature",
+              "turnOn": true,
+              "dataType": "float",
+              "defaultValue": 0.8,
+              "minValue": 0,
+              "maxValue": 1,
+              "remark": "采样温度, 较高的值(如 0.8)将使输出更加随机, 即导致更多样和创造性的输出, 而较低的值(如 0.2)将使其更加集中和确定性, 产生更保守的输出",
+              "value": 0.8
+            },
+            {
+              "name": "top_p",
+              "turnOn": false,
+              "dataType": "float",
+              "defaultValue": 0.8,
+              "minValue": 0,
+              "maxValue": 1,
+              "remark": "控制采样所使用的概率空间的比例, 即采用范围, 控制模型考虑具有 top_p 概率质量的 token 的结果",
+              "value": 0.8
+            },
+            {
+              "name": "max_tokens",
+              "turnOn": true,
+              "dataType": "int",
+              "defaultValue": 1024,
+              "minValue": 0,
+              "maxValue": 8192,
+              "remark": "生成的最大 token 数, 生成结果对应的 token 数如果超过 max_tokens 就不再生成",
+              "value": 1024
+            },
+            {
+              "name": "guided_decoding_backend",
+              "turnOn": false,
+              "dataType": "text",
+              "defaultValue": "xgrammar",
+              "remark": "解码约束的技术方案",
+              "value": "xgrammar"
+            },
+            {
+              "name": "guided_choice",
+              "turnOn": false,
+              "dataType": "list",
+              "defaultValue": [],
+              "remark": "解码约束的分类枚举值",
+              "value": []
+            },
+            {
+              "name": "guided_json",
+              "turnOn": false,
+              "dataType": "json",
+              "defaultValue": {},
+              "remark": "解码约束的Json Schema",
+              "value": {}
+            },
+            {
+              "name": "guided_regex",
+              "turnOn": false,
+              "dataType": "text",
+              "defaultValue": "",
+              "remark": "解码约束的正则表达式",
+              "value": ""
+            },
+            {
+              "name": "guided_grammar",
+              "turnOn": false,
+              "dataType": "text",
+              "defaultValue": "",
+              "remark": "解码约束的Grammar",
+              "value": ""
+            },
+            {
+              "name": "random_seed",
+              "turnOn": false,
+              "dataType": "int",
+              "defaultValue": 42,
+              "minValue": 0,
+              "maxValue": 1000,
+              "remark": "随机种子, 控制大模型的随机性, 保证输出可复现",
+              "value": 42
+            },
+            {
+              "name": "timeout",
+              "turnOn": false,
+              "dataType": "int",
+              "defaultValue": 60,
+              "minValue": 1,
+              "maxValue": 360,
+              "remark": "大模型运行的超时时长",
+              "value": 60
+            },
+            {
+              "name": "max_retries",
+              "turnOn": false,
+              "dataType": "int",
+              "defaultValue": 0,
+              "minValue": 0,
+              "maxValue": 5,
+              "remark": "尝试次数，尝试请求大模型的次数，当请求失败时会重复请求，如果 max_retries 次都没答案会报错或者返回默认结果",
+              "value": 0
+            },
+            {
+              "name": "default_result",
+              "turnOn": false,
+              "dataType": "text",
+              "defaultValue": "大模型兜底结果",
+              "remark": "大模型运行异常或者超时的兜底结果",
+              "value": "大模型兜底结果"
+            }
+          ],
+          "prompt": "你是一个友好的人工智能助手，旨在协助用户完成范围广泛的任务，从回答简单的问题到就广泛的主题提供深入的解释和讨论。\n以下是一段用户与人工智能助手之间的友好对话，人工智能助手很健谈，并根据上下文提供了许多具体细节。如果人工智能助手不知道问题的答案，它会如实说它不知道。\n用户和人工智能助手的历史对话:\n```\n{{memories}}\n```\n\n用户的问题: {{question}}\n请回复:",
+          "inputVariable": [],
+          "outputVariable": [
+            {
+              "name": "answer",
+              "dataType": "text",
+              "fallbackValue": ""
+            }
+          ],
+          "errorHandleType": "无"
+        },
+        "id": "27133446",
+        "type": "model"
+      }
+    },
+    {
+      "id": "61133221",
+      "type": "end",
+      "position": {
+        "x": 957.0129190084684,
+        "y": -29.23847739000061
+      },
+      "targetPosition": "left",
+      "sourcePosition": "right",
+      "data": {
+        "bizData": {
+          "id": "61133221",
+          "type": "end",
+          "name": "结束",
+          "description": "",
+          "position": {
+            "x": 957.0129190084684,
+            "y": -29.23847739000061
+          },
+          "outputVariable": [
+            {
+              "name": "answer"
+            },
+            {
+              "name": "answerDict"
+            },
+            {
+              "name": "sessionStatus"
+            }
+          ]
+        },
+        "id": "61133221",
+        "type": "end"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "00640654",
+      "source": "27133446",
+      "type":"button",
+      "sourceHandle": "27133446_source",
+      "target": "61133221",
+      "targetHandle": "61133221_target"
+    },
+    {
+      "id": "02577653",
+      "type":"button",
+      "source": "23531720",
+      "sourceHandle": "23531720_source",
+      "target": "27133446",
+      "targetHandle": "27133446_target"
+    }
+  ]
+}
