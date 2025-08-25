@@ -4,40 +4,29 @@
     </div>
     <div class="agent-add" v-if="!hasChildNode">
       <div class="line"></div>
-      <a-popover
-          trigger="click"
-          v-model:open="open"
-          :arrow="false"
-          :trigger="['click']"
-          placement="rightTop"
-      >
+      <a-popover trigger="click" v-model:open="open" :arrow="false" :trigger="['click']" placement="rightTop">
         <button>
           <span>添加节点</span>
         </button>
         <template #content>
-          <AgentFlowFloatAddMenu @click="addNode" :style="{position: 'static'}"></AgentFlowFloatAddMenu>
+          <AgentFlowFloatAddMenu @click="addNode" :style="{ position: 'static' }"
+            :disabled-node-types="calcDisabledNodeTypes"></AgentFlowFloatAddMenu>
         </template>
       </a-popover>
     </div>
-    <AgentFlowSourceHandle
-        :node-id="id"
-        :handle-id="sourceId"
-        :show-add-button="false"
-        handle-type="source"
-        :position="Position.Right"
-        :style="{top: '10px',pointerEvents: !hasChildNode ? 'none' : undefined}"
-    />
+    <AgentFlowSourceHandle :node-id="id" :handle-id="sourceId" :show-add-button="false" handle-type="source"
+      :position="Position.Right" :style="{ top: '10px', pointerEvents: !hasChildNode ? 'none' : undefined }" />
   </div>
 
 </template>
 
 <script setup>
-import {computed, inject, ref} from 'vue'
-import {Position, useNode, useVueFlow} from '@vue-flow/core'
+import { computed, inject, ref } from 'vue'
+import { Position, useNode, useVueFlow } from '@vue-flow/core'
 import AgentFlowSourceHandle from './AgentFlowSourceHandle.vue'
 import AgentFlowFloatAddMenu from "@/components/AgentFlowFloatAddMenu.vue";
-import {getSourceHandleId, useOperation} from "@/util/createNode.js";
-
+import { getSourceHandleId, useOperation } from "@/util/createNode.js";
+import { useMenu } from "@/util/createNode.js";
 const props = defineProps({
   id: {
     type: String,
@@ -52,7 +41,7 @@ const sourceId = computed(() => getSourceHandleId(props.id, "source"))
 const open = ref(false);
 const nestStartNode = useNode(props.id)
 const parentNodeId = nestStartNode?.node?.parentNode
-const {nodes} = useVueFlow()
+const { nodes } = useVueFlow()
 const hasChildNode = computed(() => {
   if (!parentNodeId) {
     return []
@@ -61,7 +50,8 @@ const hasChildNode = computed(() => {
   const hasSomeNestNodes = nestNodes.length >= 2
   return hasSomeNestNodes
 })
-let {handleClick} = useOperation()
+let { calcDisabledNodeTypes } = useMenu(props.id)
+let { handleClick } = useOperation()
 const addNode = (type) => {
   open.value = false
   handleClick(type, props.id)

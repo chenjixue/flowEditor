@@ -1,9 +1,14 @@
 <template>
   <AgentFlowNodeContent :id="id" :data="data" />
 
-  <AgentFlowSourceHandle :node-id="id" :handle-id="sourceId" handle-type="source" :position="Position.Right" />
-
+  <!-- 左侧输入 -->
   <AgentFlowSourceHandle :node-id="id" :handle-id="targetId" handle-type="target" :position="Position.Left" />
+
+  <!-- 右侧两个输出：if / else -->
+  <AgentFlowSourceHandle :node-id="id" :handle-id="sourceIdIf" handle-type="source_if" :position="Position.Right"
+    :style="{ top: '18px' }" />
+  <AgentFlowSourceHandle :node-id="id" :handle-id="sourceIdElse" handle-type="source_else" :position="Position.Right"
+    :style="{ top: '50px' }" />
 </template>
 
 <script setup>
@@ -21,8 +26,11 @@ const props = defineProps({
   data: {
     type: Object,
     required: true
-  },
+  }
 })
-const sourceId = computed(() => getSourceHandleId(props.id, AgentFlowSourceHandleType.Source))
+const sourceIdIf = computed(() => getSourceHandleId(props.id, AgentFlowSourceHandleType.SourceIf))
+const sourceIdElse = computed(() =>
+  getSourceHandleId(props.id, AgentFlowSourceHandleType.SourceElse)
+)
 const targetId = computed(() => getSourceHandleId(props.id, AgentFlowSourceHandleType.Target))
 </script>

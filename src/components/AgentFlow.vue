@@ -40,6 +40,9 @@
     <template #node-loop="{ id, data }">
       <AgentFlowNodeTypeNestParent :id="id" :data="data"/>
     </template>
+    <template #node-condition="{ id, data }">
+      <AgentFlowNodeTypeCondition :id="id" :data="data" />
+    </template>
     <template #node-nestedStart="{ id, data }">
       <AgentFlowNodeTypeNestStart :id="id" :data="data"/>
     </template>
@@ -53,6 +56,7 @@ import "@vue-flow/core/dist/theme-default.css";
 import {VueFlow, useVueFlow, Panel, ConnectionMode} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
 import AgentFlowNodeTypeCommon from "./AgentFlowNodeTypeCommon.vue";
+import AgentFlowNodeTypeCondition from "@/components/AgentFlowNodeTypeCondition.vue";
 import AgentFlowNodeTypeNestParent from "@/components/AgentFlowNodeTypeNestParent.vue";
 import AgentFlowNodeTypeNestStart from "@/components/AgentFlowNodeTypeNestStart.vue";
 import {useOperation} from "@/util/createNode.js";
@@ -96,6 +100,7 @@ const {
   addEdges,
   updateNodeInternals
 } = useVueFlow();
+
 onPaneClick(e => {
   document.dispatchEvent(new MouseEvent('mousedown', {
     bubbles: true,

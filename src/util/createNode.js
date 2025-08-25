@@ -1,34 +1,10 @@
-import {useVueFlow} from "@vue-flow/core";
+import { useVueFlow } from "@vue-flow/core";
 import dagre from '@dagrejs/dagre'
-import {ref} from 'vue'
+import { ref, computed } from 'vue'
 
 export function getSourceHandleId(nodeId, sourceHandleType) {
     return `${nodeId}_${sourceHandleType}`
 }
-
-
-// export function getNodeLayoutOffset(type) {
-//     const dimensionsOffset = {
-//         width: 0,
-//         height: 0,
-//     }
-//     const positionOffset = {
-//         x: 0,
-//         y: 0,
-//     }
-//     //
-//     // if (["loop"].includes(type)) {
-//     //     dimensionsOffset.width = 64
-//     //     dimensionsOffset.height = 82
-//     //     positionOffset.x = 32
-//     //     positionOffset.y = 58
-//     // }
-//
-//     return {
-//         dimensionsOffset,
-//         positionOffset,
-//     }
-// }
 
 export let useOperation = () => {
     const {
@@ -41,7 +17,7 @@ export let useOperation = () => {
         edges,
         nodes
     } = useVueFlow()
-    let {layout} = uselayout()
+    let { layout } = uselayout()
     let createNode = (type) => {
         const nodeId = parseInt(Math.random() * 1000) + ''
         const position = {
@@ -57,21 +33,21 @@ export let useOperation = () => {
             data: {
                 id: nodeId,
                 type,
-                bizData: {nodeId, type, position}
+                bizData: { nodeId, type, position }
             },
         }
     }
-    let createEdge = (sourceId, targetId) => {
+    let createEdge = (sourceId, targetId, sourceHandleType = 'source', targetHandleType = 'target') => {
         const edgeId = parseInt(Math.random() * 1000) + ''
         return {
             id: edgeId,
             type: 'button',
             source: sourceId,
-            sourceHandle: getSourceHandleId(sourceId, "source"),
+            sourceHandle: getSourceHandleId(sourceId, sourceHandleType),
             target: targetId,
             targetHandle: getSourceHandleId(
                 targetId,
-                "target",
+                targetHandleType,
             ),
         }
     }
@@ -147,19 +123,16 @@ export let useOperation = () => {
         }
         newNode.data.bizData.position = newNode.position
 
-        const moveOffsetX = newNode.dimensions.width + 60
+        const moveOffsetX = newNode.dimensions.width + 120
         moveNode(targetNode.id, moveOffsetX, 0)
         // }
     }
 
-    let handleClick = (type, sourceId, targetId) => {
-
+    let handleClick = (type, sourceId, targetId, sourceHandleType = 'source', targetHandleType = 'target') => {
         let parentNodeId;
         let newNode = createNode(type);
 
         let t = (sourceId && findNode(sourceId))
-        // debugger
-        console.log(nodes, "nodes---")
         parentNodeId = t?.parentNode
         // parentNodeId.par
         // 处理嵌套节点
@@ -184,20 +157,15 @@ export let useOperation = () => {
             appendNodes.push(nestedStartNode)
         }
         let appendEdges = []
-        let newEdge
         if (sourceId) {
-            newEdge = createEdge(sourceId, newNode.id)
+            appendEdges.push(createEdge(sourceId, newNode.id, sourceHandleType, targetHandleType))
         }
-        if (targetId) {
-            newEdge = createEdge(newNode.id, targetId)
+        if (targetId && type !== 'condition') {
+            appendEdges.push(createEdge(newNode.id, targetId, sourceHandleType, targetHandleType))
         }
-        appendEdges.push(newEdge)
         addNodes(appendNodes)
         addEdges(appendEdges)
-        const {off} = onNodesInitialized(() => {
-            // insertNodeAt(newNode.id)
-            // updateNodeInternals([nodeId])
-            // debugger
+        const { off } = onNodesInitialized(() => {
             if (sourceId) {
                 const createFromNode = findNode(sourceId)
 
@@ -210,11 +178,19 @@ export let useOperation = () => {
                     addedNode.position = newPosition
                     addedNode.data.bizData.position = newPosition
                 } else {
+                    // 除了来自的创造节点以外他的所有target节点都要输入
                     const addedNode = findNode(newNode.id)
                     const layoutNodes = [createFromNode]
+                    // 找到 createFromNode 的所有 target 节点
+                    const targetEdges = edges.value.filter(edge => edge.source === createFromNode.id)
+                    const targetNodes = targetEdges.map(edge => findNode(edge.target)).filter(Boolean)
+                    // 将 createFromNode 和它的所有 target 节点都添加到 layoutNodes
+                    layoutNodes.push(...targetNodes)
+                    // layoutNodes.push(addedNode)
+                    
                     const layoutEdges = []
-                    layoutNodes.push(addedNode)
-                    layoutEdges.push(...appendEdges)
+                    // 将 createFromNode 与其所有 target 节点之间已有的连线加入 layoutEdges
+                    layoutEdges.push(...targetEdges)
                     const createFromNodeOrigin = {
                         ...createFromNode.position
                     }
@@ -223,7 +199,6 @@ export let useOperation = () => {
                         (t) => t.id === createFromNode.id
                     )?.position
                     const addedNodePosition = updatedNodes.find((t) => t.id === newNode.id)?.position
-                    // debugger
                     addedNodePosition.x =
                         addedNodePosition.x - (createFromNodeNewOrigin.x - createFromNodeOrigin.x)
                     addedNodePosition.y =
@@ -236,41 +211,15 @@ export let useOperation = () => {
             if (targetId) {
                 insertNodeAt(newNode.id, targetId)
             }
-            if (parentNodeId) {
-                const parentNode = findNode(parentNodeId)
-
-                // 更新所有子节点、父节点
-                const childrenIds = nodes.value
-                    .filter((t) => t.parentNode === parentNodeId)
-                    .map((t) => t.id)
-                updateNodeInternals([parentNodeId, ...childrenIds])
-
-                // 如果父节点宽度发生变化，移动其所有下游节点
-                // const afterParentWidth = parentNode?.dimensions?.width || 0
-                //
-                // if (afterParentWidth !== beforeParentWidth) {
-                //     const targetNodes = edges.value
-                //         .filter((t) => t.source === parentNodeId)
-                //         .map((t) => t.target)
-                //
-                //     targetNodes.forEach((t) => moveNode(t, afterParentWidth - beforeParentWidth, 0))
-                // }
-            }
-            // else if (edge) {
-            //     insertNodeAt(newNode.id, edge.target)
-            // }
-            // else {
-            //     insertNodeAt(newNode.id)
-            // }
             off()
         })
     }
 
-    return {handleClick, collectDescendantNodes, createNode, createEdge, insertNodeAt}
+    return { handleClick, collectDescendantNodes, createNode, createEdge, insertNodeAt }
 }
 
 export let uselayout = () => {
-    let {findNode} = useVueFlow()
+    let { findNode } = useVueFlow()
 
 
     let layout = (nodes, edges) => {
@@ -285,8 +234,8 @@ export let uselayout = () => {
         dagreGraph.setGraph({
             rankdir: 'LR',
             align: 'UL',
-            ranksep: 60,
-            nodesep: 30,
+            ranksep: 120,
+            nodesep: 60,
         })
 
         for (const node of nodes) {
@@ -352,5 +301,20 @@ export let uselayout = () => {
 
         return next
     }
-    return {layout}
+    return { layout }
+}
+
+export let useMenu = (nodeId) => {
+    const { findNode } = useVueFlow()
+    let calcDisabledNodeTypes = computed(() => {
+        let disableNodeTypes = []
+        let currentNode = findNode(nodeId)
+        let parentNode = findNode(currentNode?.parentNode)
+        if (parentNode?.type == "loop") {
+            disableNodeTypes.push("loop")
+            return disableNodeTypes
+        }
+    })
+
+    return { calcDisabledNodeTypes }
 }
