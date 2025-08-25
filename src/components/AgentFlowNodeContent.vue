@@ -1,24 +1,21 @@
 <template>
-  <div class="agent-flow-node-content">
+  <div :class="['agent-flow-node-content', data.type === 'loop' && 'is-loop']">
     <div class="header">
       节点类型{{ data.bizData.type }}
     </div>
-    <AgentFlowNodeSummary v-if="data.type === 'loop'" :data="data"/>
+    <AgentFlowNodeSummary v-if="data.type === 'loop'" :data="data" />
     <div class="single-node-content" v-else></div>
     <div v-if="data.type === 'loop'" class="agent-flow-node-content__nest-parent__resizer">
-      <NodeResizer
-          :min-height="resizerDimensionsLimit.height"
-          :min-width="resizerDimensionsLimit.width"
-      />
+      <NodeResizer :min-height="resizerDimensionsLimit.height" :min-width="resizerDimensionsLimit.width" />
     </div>
   </div>
 </template>
 
 <script setup>
 import AgentFlowNodeSummary from "@/components/AgentFlowNodeSummary.vue";
-import {NodeResizer} from '@vue-flow/node-resizer'
-import { computed} from 'vue'
-import {useVueFlow} from "@vue-flow/core";
+import { NodeResizer } from '@vue-flow/node-resizer'
+import { computed } from 'vue'
+import { useVueFlow } from "@vue-flow/core";
 const props = defineProps({
   id: {
     type: String,
@@ -32,7 +29,7 @@ const props = defineProps({
 const { nodes } = useVueFlow()
 const resizerDimensionsLimit = computed(() => {
 
-  if(!props.id  || props.data.type !== 'loop'){
+  if (!props.id || props.data.type !== 'loop') {
     return {
       width: 0,
       height: 0,
@@ -51,8 +48,8 @@ const resizerDimensionsLimit = computed(() => {
     if (bottomY > maxPosition.y) maxPosition.y = bottomY
   })
   return {
-    width: Math.max(maxPosition.x + 40, 190),
-    height: Math.max(maxPosition.y + 40, 120)
+    width: Math.max(maxPosition.x, 190),
+    height: Math.max(maxPosition.y, 120)
   }
 })
 </script>
@@ -62,7 +59,6 @@ const resizerDimensionsLimit = computed(() => {
   width: 100%;
   min-width: 180px;
   box-sizing: border-box;
-  height: 100%;
 
   .header {
     background: #fff;
@@ -84,5 +80,4 @@ const resizerDimensionsLimit = computed(() => {
   // overflow: hidden;
   //position: relative;
 }
-
 </style>

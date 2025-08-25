@@ -1,53 +1,33 @@
 <template>
-  <a-popover
-      v-model:open="open"
-      :arrow="false"
-      :trigger="['click']"
-      placement="rightTop"
-      :overlay-inner-style="{
-      padding: '8px'
-    }"
-  >
-    <Handle
-        :id="handleId"
-        :type="handleType"
-        :position="position"
-        class="agent-flow-source-handle"
-        :class="handleClassName"
-        :style="style"
-    >
-      <div
-          ref="handleSizeRef"
-          class="agent-flow-source-handle__add-icon-wrap"
-      >
-        <img
-            v-if="showAddButton"
-            src='/img/node-icon-add-next.svg'
-            class="agent-flow-source-handle__add-icon"
-        />
+  <a-popover v-model:open="open" :arrow="false" :trigger="['click']" placement="rightTop" :overlay-inner-style="{
+    padding: '8px'
+  }">
+    <Handle :id="handleId" :type="calcHandleType" :position="position" class="agent-flow-source-handle"
+      :class="handleClassName" :style="style">
+      <div ref="handleSizeRef" class="agent-flow-source-handle__add-icon-wrap" v-if="showAddButton">
+        <img src='/img/node-icon-add-next.svg' class="agent-flow-source-handle__add-icon" />
       </div>
-      <div
-          class="agent-flow-source-handle__connect-end"
-          :class="`agent-flow-source-handle__connect-end--${position}`"
-          :style="{
-          backgroundColor:'#b1b1b7'
-        }"
-      ></div>
+      <div class="agent-flow-source-handle__connect-end" :class="`agent-flow-source-handle__connect-end--${position}`"
+        :style="{
+          backgroundColor: '#b1b1b7'
+        }"></div>
     </Handle>
     <template #content>
-      <AgentFlowFloatAddMenu @click="addNode" :style="{position: 'static'}"></AgentFlowFloatAddMenu>
+      <AgentFlowFloatAddMenu @click="addNode" :style="{ position: 'static' }"
+        :disabled-node-types="calcDisabledNodeTypes">
+      </AgentFlowFloatAddMenu>
     </template>
   </a-popover>
 </template>
 
 <script setup>
-import {computed, inject, ref, onBeforeUnmount, watch, getCurrentInstance} from 'vue'
-import {useNode, Handle, useVueFlow} from '@vue-flow/core'
+import { computed, inject, ref, onBeforeUnmount, watch, getCurrentInstance } from 'vue'
+import { useNode, Handle, useVueFlow } from '@vue-flow/core'
 import AgentFlowFloatAddMenu from "@/components/AgentFlowFloatAddMenu.vue";
-import {getSourceHandleId, useOperation} from "@/util/createNode.js";
-import {AgentFlowSourceHandleType} from "@/util/AgentFlowEnum.js";
-
-const {proxy: instance} = getCurrentInstance()
+import { getSourceHandleId, useOperation } from "@/util/createNode.js";
+import { AgentFlowSourceHandleType } from "@/util/AgentFlowEnum.js";
+import { useMenu } from "@/util/createNode.js";
+const { proxy: instance } = getCurrentInstance()
 
 const props = defineProps({
   /** nodeId */
@@ -73,20 +53,40 @@ const props = defineProps({
   }
 })
 const node = useNode(props.nodeId)
+const calcHandleType = computed(()=>{
+  let targetHandleType = ['target']
+   let sourceHandleType = ['source','source_if','source_else']
+   if (sourceHandleType.includes(props.handleType)) {
+     return 'source'
+   }
+   if (targetHandleType.includes(props.handleType)) {
+     return 'target'
+   }
+})
 const handleId = computed(() => {
-      if (props.handleType === 'target') {
-        return getSourceHandleId(props.nodeId, AgentFlowSourceHandleType.Target)
-      }
-      if (props.handleType === 'source') {
-        return getSourceHandleId(props.nodeId, AgentFlowSourceHandleType.Source)
-      }
-    }
+  let resultHandleId =""
+  if (props.handleType === 'target') {
+    resultHandleId= getSourceHandleId(props.nodeId, AgentFlowSourceHandleType.Target)
+  }
+  if (props.handleType === 'source') {
+    resultHandleId = getSourceHandleId(props.nodeId, AgentFlowSourceHandleType.Source)
+  }
+  if (props.handleType === 'source_if') {
+    resultHandleId=  getSourceHandleId(props.nodeId, AgentFlowSourceHandleType.SourceIf)
+  }
+  if (props.handleType === 'source_else') {
+    resultHandleId= getSourceHandleId(props.nodeId, AgentFlowSourceHandleType.SourceElse)
+  }
+  return resultHandleId
+}
 )
+let { calcDisabledNodeTypes } = useMenu(props.nodeId)
+
 const isConnected = computed(() => {
   return Boolean(
-      node?.connectedEdges?.value?.some(
-          (t) => t.sourceHandle === handleId.value || t.targetHandle === handleId.value
-      )
+    node?.connectedEdges?.value?.some(
+      (t) => t.sourceHandle === handleId.value || t.targetHandle === handleId.value
+    )
   )
 })
 
@@ -103,15 +103,15 @@ const handleClassName = computed(() => {
   }
   return cls
 })
-let {handleClick} = useOperation()
+let { handleClick } = useOperation()
 const open = ref(false)
 const addNode = (type) => {
   open.value = false
-  if (props.handleType === "source") {
-    handleClick(type, props.nodeId, null)
+  if (props.handleType === "source" || props.handleType === 'source_if' || props.handleType === 'source_else') {
+    handleClick(type, props.nodeId, null, props.handleType, 'target')
   }
   if (props.handleType === "target") {
-    handleClick(type, null, props.nodeId)
+    handleClick(type, null, props.nodeId, 'source', 'target')
   }
 }
 </script>
